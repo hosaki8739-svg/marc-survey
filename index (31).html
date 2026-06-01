@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARCプログラム事前アンケート</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --ink-light: #4a4a6a;
+      --paper: #f8f5f0;
+      --paper-dark: #ede9e0;
+      --accent: #8b1a1a;
+      --accent-light: #c0392b;
+      --gold: #c9a84c;
+      --border: #d4cfc6;
+      --shadow: rgba(26,26,46,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    /* ヘッダー */
+    .site-header {
+      background: var(--ink);
+      color: white;
+      padding: 32px 24px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 40px,
+        rgba(201,168,76,0.04) 40px,
+        rgba(201,168,76,0.04) 80px
+      );
+    }
+    .site-header .label {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .site-header h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(18px, 4vw, 24px);
+      font-weight: 700;
+      line-height: 1.5;
+      position: relative;
+    }
+    .site-header .subtitle {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 1px;
+    }
+
+    /* 進捗バー */
+    .progress-bar {
+      height: 3px;
+      background: var(--paper-dark);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* メインコンテナ */
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* 導入文 */
+    .intro {
+      background: white;
+      border-left: 3px solid var(--gold);
+      padding: 20px 24px;
+      margin: 28px 0 0;
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--ink-light);
+    }
+    .intro strong {
+      color: var(--ink);
+    }
+
+    /* 一時保存バナー */
+    .save-banner {
+      background: var(--ink);
+      color: white;
+      padding: 12px 20px;
+      margin: 20px 0 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .save-banner .save-info {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      flex: 1;
+    }
+    .save-banner .save-info strong {
+      color: var(--gold);
+      display: block;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+    .btn-save {
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 3px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .btn-save:hover { opacity: 0.85; }
+
+    /* セクション */
+    .section {
+      margin-top: 32px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-number {
+      background: var(--accent);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* 質問カード */
+    .q-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .q-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .q-text {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.7;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .q-note {
+      font-size: 12px;
+      color: var(--ink-light);
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      background: var(--paper);
+      border-radius: 3px;
+    }
+
+    /* 基本入力 */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-light);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+      background: white;
+    }
+
+    /* ラジオ・チェックボックス */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .option-item:hover {
+      background: var(--paper);
+      border-color: var(--accent);
+    }
+    .option-item input {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .option-item.selected {
+      background: #fdf5f5;
+      border-color: var(--accent);
+    }
+    .option-label {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    /* テキストエリア */
+    .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.8;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-textarea:focus {
+      border-color: var(--accent);
+      background: white;
+    }
+
+    /* 表形式（Q1） */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      overflow-x: auto;
+      display: block;
+    }
+    .matrix-table th {
+      background: var(--ink);
+      color: white;
+      padding: 10px 8px;
+      text-align: center;
+      font-weight: 500;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+    .matrix-table th:first-child {
+      text-align: left;
+      min-width: 120px;
+    }
+    .matrix-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      vertical-align: middle;
+    }
+    .matrix-table td:first-child {
+      text-align: left;
+      font-size: 13px;
+      font-weight: 500;
+      padding-left: 12px;
+      white-space: nowrap;
+    }
+    .matrix-table tr:hover td {
+      background: var(--paper);
+    }
+    .matrix-table input[type="radio"] {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* チェックボックスグリッド（Q3） */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+    }
+
+    /* Q4・Q5 順位付き選択 */
+    .rank-select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rank-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .rank-item select {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      outline: none;
+      cursor: pointer;
+    }
+    .rank-item select:focus {
+      border-color: var(--accent);
+      background: white;
+    }
+
+    /* その他入力 */
+    .other-input {
+      margin-top: 8px;
+      display: none;
+    }
+    .other-input.visible {
+      display: block;
+    }
+    .other-input input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--paper);
+      outline: none;
+    }
+
+    /* 送信ボタンエリア */
+    .submit-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-save-inline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .btn-save-inline:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* 送信ボタン */
+    .submit-area {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 16px 48px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Noto Serif JP', serif;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(139,26,26,0.3);
+    }
+    .btn-submit:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139,26,26,0.35);
+    }
+    .btn-submit:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .submit-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--ink-light);
+    }
+
+    /* 完了メッセージ */
+    .complete-msg {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .complete-msg .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .complete-msg h2 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 22px;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .complete-msg p {
+      font-size: 13px;
+      color: var(--ink-light);
+      line-height: 1.8;
+    }
+
+    /* トースト通知 */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      box-shadow: 0 4px 16px var(--shadow);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.success { border-left: 3px solid var(--gold); }
+    .toast.error { border-left: 3px solid var(--accent); }
+
+    /* 必須マーク */
+    .required {
+      color: var(--accent);
+      margin-left: 4px;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      /* 全体 */
+      body { padding: 0 0 60px; }
+      .container { padding: 0 12px; }
+      .q-card { padding: 14px 14px; }
+      .q-text { font-size: 13px; }
+      .section { margin-top: 24px; }
+
+      /* ヘッダー */
+      .site-header { padding: 24px 16px 20px; }
+
+      /* 保存バナー */
+      .save-banner { padding: 10px 14px; }
+
+      /* Q1テーブル → カード形式に切り替え */
+      .matrix-table thead { display: none; }
+      .matrix-table, .matrix-table tbody, .matrix-table tr, .matrix-table td {
+        display: block;
+        width: 100%;
+      }
+      .matrix-table tr {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+      .matrix-table td:first-child {
+        background: var(--ink);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 10px 14px;
+        white-space: normal;
+      }
+      .matrix-table td:not(:first-child) {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+      .matrix-table td:not(:first-child)::before {
+        content: attr(data-label);
+        font-size: 12px;
+        color: var(--ink-light);
+        flex: 1;
+        line-height: 1.4;
+      }
+      .matrix-table td:last-child { border-bottom: none; }
+      .matrix-table input[type="radio"] {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+
+      /* Q3チェックボックス */
+      .checkbox-grid { grid-template-columns: 1fr; }
+
+      /* 送信ボタン */
+      .submit-buttons { flex-direction: column; width: 100%; }
+      .btn-submit, .btn-save-inline {
+        width: 100%;
+        font-size: 14px;
+        padding: 14px 20px;
+      }
+
+      /* トースト */
+      .toast { left: 16px; right: 16px; bottom: 16px; font-size: 12px; }
+
+      /* ランク選択 */
+      .rank-item select { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="label">MARC PROGRAM · 2026</div>
+  <h1>事前アンケート</h1>
+  <div class="subtitle">所要時間：約8分</div>
+</header>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="container">
+
+  <div class="intro">
+    <strong>ご協力のお願い</strong><br>
+    本アンケートは、MARCプログラム導入に向けた事前調査です。
+    先生方が日頃の指導で感じていらっしゃることを率直にお聞かせください。
+    
+  </div>
+
+  <div class="save-banner">
+    <div class="save-info">
+      <strong>一時保存について</strong>
+      氏名を入力後、送信ボタン横の「一時保存」で途中まで保存できます。再開時は氏名を入力してください。
+    </div>
+  </div>
+
+  <form id="surveyForm" novalidate>
+
+    <!-- ============ 基本情報 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--ink-light);">―</div>
+        <div class="section-title">基本情報</div>
+      </div>
+
+      <div class="q-card">
+        <div class="form-group">
+          <label class="form-label">学校名<span class="required">*</span></label>
+          <input type="text" id="schoolName" class="form-input" placeholder="例：剣星高等学校" required>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">顧問氏名<span class="required">*</span>（お二人の場合は代表者のお名前）</label>
+          <input type="text" id="advisorName" class="form-input" placeholder="例：山田太郎" required oninput="tryLoadSaved()">
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ セクション1 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <div class="section-title">自律度について</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q1</div>
+        <div class="q-text">以下の活動について、現在の状態に最も近いものを選んでください。<span class="required">*</span></div>
+
+        <div style="overflow-x:auto;">
+          <table class="matrix-table" id="q1Table">
+            <thead>
+              <tr>
+                <th>活動</th>
+                <th>顧問主導</th>
+                <th>顧問と生徒が共同</th>
+                <th>生徒主体<br>（顧問は必要時のみ介入）</th>
+                <th>生徒主体<br>（顧問が不在でも運営可能）</th>
+              </tr>
+            </thead>
+            <tbody id="q1Body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ セクション2 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <div class="section-title">生徒について</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q2</div>
+        <div class="q-text">生徒が自分から「こういう稽古をしたい」「こういう練習を取り入れたい」と提案してきたことがありますか？<span class="required">*</span></div>
+        <div class="options-list" id="q2Options"></div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q2-2</div>
+        <div class="q-text">生徒だけで稽古を行った場合でも、稽古の質は維持されると思いますか？<span class="required">*</span></div>
+        <div class="options-list" id="q2bOptions"></div>
+      </div>
+    </div>
+
+    <!-- ============ セクション3 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <div class="section-title">課題について</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q3</div>
+        <div class="q-text">現在のチームの課題として当てはまるものを3つまで選んでください。<span class="required">*</span></div>
+        <div class="q-note">最大3つまで選択できます。</div>
+        <div class="checkbox-grid" id="q3Options"></div>
+        <div class="other-input" id="q3OtherInput">
+          <input type="text" placeholder="その他の課題を入力してください" id="q3OtherText">
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ セクション4 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <div class="section-title">時間配分について</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q4</div>
+        <div class="q-text">現在、指導の中で最も時間を取られていることはどれですか？<span class="required">*</span></div>
+        <div class="q-note">上位2つまで選択してください。</div>
+        <div class="rank-select-group">
+          <div class="rank-item">
+            <span class="rank-badge">1位</span>
+            <select id="q4First">
+              <option value="">選択してください</option>
+            </select>
+          </div>
+          <div class="rank-item">
+            <span class="rank-badge">2位</span>
+            <select id="q4Second">
+              <option value="">選択してください</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q5</div>
+        <div class="q-text">本来もっと時間をかけたい活動はどれですか？<span class="required">*</span></div>
+        <div class="q-note">上位2つまで選択してください。</div>
+        <div class="rank-select-group">
+          <div class="rank-item">
+            <span class="rank-badge">1位</span>
+            <select id="q5First">
+              <option value="">選択してください</option>
+            </select>
+          </div>
+          <div class="rank-item">
+            <span class="rank-badge">2位</span>
+            <select id="q5Second">
+              <option value="">選択してください</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q6</div>
+        <div class="q-text">部活動指導以外（書類・連絡・会議等）に費やす時間は週あたりどの程度ですか？<span class="required">*</span></div>
+        <div class="options-list" id="q6Options"></div>
+      </div>
+    </div>
+
+    <!-- ============ セクション5 ============ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <div class="section-title">このプログラムへの期待</div>
+      </div>
+
+      <div class="q-card">
+        <div class="q-label">Q7</div>
+        <div class="q-text">このプログラムに期待することを自由にご記入ください。</div>
+        <textarea class="form-textarea" id="q7Text" placeholder="どのような変化や効果を期待されますか？ご自由にお書きください。"></textarea>
+      </div>
+    </div>
+
+    <!-- 送信 -->
+    <div class="submit-area">
+      <div class="submit-buttons">
+        <button type="button" class="btn-save-inline" onclick="saveProgress()">一時保存</button>
+        <button type="button" class="btn-submit" id="submitBtn" onclick="submitForm()">回答を送信する</button>
+      </div>
+      <div class="submit-note">送信前に一度内容をご確認ください</div>
+    </div>
+
+  </form>
+
+  <!-- 完了メッセージ -->
+  <div class="complete-msg" id="completeMsg">
+    <div class="icon">⛩</div>
+    <h2>ご回答ありがとうございました</h2>
+    <p>
+      先生のご回答はMARCプログラムの<br>
+      改善と実証研究に活用いたします。<br><br>
+      ご不明な点がありましたら<br>
+      担当者までご連絡ください。
+    </p>
+  </div>
+
+</div><!-- /container -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// 設定
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxDdLUVvEyjvcmuFeVYn3jpkRitmleILJPdBbgfegUKMEtprKAwGwhtk_-m0Vd0IAG5/exec'
+
+// ============================================================
+// データ定義
+// ============================================================
+const Q1_ROWS = [
+  { id: 'plan',           label: '稽古計画の立案' },
+  { id: 'operation',      label: '稽古の進行・運営' },
+  { id: 'personalGoal',   label: '個人目標の設定' },
+  { id: 'teamGoal',       label: 'チーム目標・方針の設定' },
+  { id: 'reflection',     label: '振り返り・反省' },
+  { id: 'juniorCoaching', label: '下級生指導' },
+];
+const Q1_COLS = [
+  { value: '顧問主導',                      label: '顧問主導' },
+  { value: '顧問と生徒が共同',              label: '顧問と生徒が共同' },
+  { value: '生徒主体（顧問は必要時のみ介入）', label: '生徒主体（必要時のみ介入）' },
+  { value: '生徒主体（顧問が不在でも運営可能）', label: '生徒主体（不在でも可能）' },
+];
+
+const Q2_OPTIONS = ['よくある','時々ある','ほとんどない','ない'];
+const Q2B_OPTIONS = ['十分維持される','ある程度維持される','あまり維持されない','ほとんど維持されない','わからない'];
+
+const Q3_ITEMS = [
+  { id: 'technique',       label: '技術・稽古の質の向上' },
+  { id: 'kiken',           label: '試合での気剣体の一致・判断力' },
+  { id: 'initiative',      label: '主体性（自ら考え動く力）' },
+  { id: 'teamwork',        label: '団体戦の連携・チーム運営' },
+  { id: 'motivation',      label: '稽古への意欲・気合いの維持' },
+  { id: 'communication',   label: '部員間の意思疎通・信頼関係' },
+  { id: 'goalSharing',     label: '部としての目標・方針の共有' },
+  { id: 'mentalStrength',  label: '試合・審査での平常心の維持' },
+  { id: 'other',           label: 'その他' },
+];
+
+const Q4_OPTIONS = [
+  '技術指導','稽古計画の設計','振り返り・面談',
+  '保護者対応','大会運営・引率準備','事務作業・書類対応','安全管理'
+];
+const Q5_OPTIONS = [
+  '技術指導・稽古の質の向上','個々の生徒との対話・面談',
+  'チームの目標設定・方針共有','生徒自身の振り返り・内省の支援',
+  '他校との練習試合・合同稽古の企画','戦術研究・見取り稽古の充実',
+  '自己研鑽・審判技術の向上','剣道の伝統・礼法・人間形成に関わる指導'
+];
+const Q6_OPTIONS = ['0〜2時間','3〜5時間','6〜10時間','11時間以上'];
+
+// ============================================================
+// 氏名正規化（全角・半角スペース除去）
+// ============================================================
+function normalizeName(name) {
+  return name.replace(/[\s\u3000]/g, '').toLowerCase();
+}
+
+// ============================================================
+// 初期化：DOM構築
+// ============================================================
+function buildForm() {
+  // Q1 テーブル（スマホ用data-label付き）
+  const tbody = document.getElementById('q1Body');
+  Q1_ROWS.forEach(row => {
+    const tr = document.createElement('tr');
+    let html = `<td>${row.label}</td>`;
+    Q1_COLS.forEach(col => {
+      html += `<td data-label="${col.label}"><input type="radio" name="q1_${row.id}" value="${col.value}" required></td>`;
+    });
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+
+  // ラジオ系
+  buildRadioGroup('q2Options',  'q2',  Q2_OPTIONS);
+  buildRadioGroup('q2bOptions', 'q2b', Q2B_OPTIONS);
+  buildRadioGroup('q6Options',  'q6',  Q6_OPTIONS);
+
+  // Q3 チェックボックス
+  const q3Container = document.getElementById('q3Options');
+  Q3_ITEMS.forEach(item => {
+    const label = document.createElement('label');
+    label.className = 'option-item';
+    label.innerHTML = `
+      <input type="checkbox" name="q3" value="${item.id}" onchange="onQ3Change(this)">
+      <span class="option-label">${item.label}</span>
+    `;
+    q3Container.appendChild(label);
+  });
+
+  // Q4・Q5 セレクト
+  buildSelectOptions('q4First',  Q4_OPTIONS);
+  buildSelectOptions('q4Second', Q4_OPTIONS);
+  buildSelectOptions('q5First',  Q5_OPTIONS);
+  buildSelectOptions('q5Second', Q5_OPTIONS);
+}
+
+function buildRadioGroup(containerId, name, options) {
+  const container = document.getElementById(containerId);
+  options.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'option-item';
+    label.innerHTML = `
+      <input type="radio" name="${name}" value="${opt}" onchange="updateSelected(this)">
+      <span class="option-label">${opt}</span>
+    `;
+    container.appendChild(label);
+  });
+}
+
+function buildSelectOptions(selectId, options) {
+  const sel = document.getElementById(selectId);
+  options.forEach(opt => {
+    const option = document.createElement('option');
+    option.value = opt;
+    option.textContent = opt;
+    sel.appendChild(option);
+  });
+}
+
+// ============================================================
+// UI インタラクション
+// ============================================================
+function updateSelected(input) {
+  const siblings = document.querySelectorAll(`input[name="${input.name}"]`);
+  siblings.forEach(s => s.closest('.option-item').classList.remove('selected'));
+  if (input.checked) input.closest('.option-item').classList.add('selected');
+  updateProgress();
+}
+
+function onQ3Change(input) {
+  const checked = document.querySelectorAll('input[name="q3"]:checked');
+  // 3つ以上選べないように
+  if (checked.length > 3) {
+    input.checked = false;
+    showToast('最大3つまで選択できます', 'error');
+    return;
+  }
+  // その他の表示制御
+  const otherInput = document.getElementById('q3OtherInput');
+  const otherChecked = document.querySelector('input[name="q3"][value="other"]');
+  otherInput.classList.toggle('visible', otherChecked && otherChecked.checked);
+
+  input.closest('.option-item').classList.toggle('selected', input.checked);
+  updateProgress();
+}
+
+// ============================================================
+// 進捗バー
+// ============================================================
+function updateProgress() {
+  const total = 8; // Q1〜Q6の必須項目数（概算）
+  let filled = 0;
+  if (document.getElementById('schoolName').value.trim()) filled++;
+  if (document.getElementById('advisorName').value.trim()) filled++;
+  const q1Filled = Q1_ROWS.filter(r => document.querySelector(`input[name="q1_${r.id}"]:checked`)).length;
+  if (q1Filled === Q1_ROWS.length) filled++;
+  if (document.querySelector('input[name="q2"]:checked')) filled++;
+  if (document.querySelector('input[name="q2b"]:checked')) filled++;
+  if (document.querySelectorAll('input[name="q3"]:checked').length > 0) filled++;
+  if (document.getElementById('q4First').value) filled++;
+  if (document.querySelector('input[name="q6"]:checked')) filled++;
+  document.getElementById('progressFill').style.width = `${Math.round((filled / total) * 100)}%`;
+}
+
+document.getElementById('schoolName').addEventListener('input', updateProgress);
+document.getElementById('advisorName').addEventListener('input', updateProgress);
+document.querySelectorAll('select').forEach(s => s.addEventListener('change', updateProgress));
+
+// ============================================================
+// 一時保存 / 呼び出し
+// ============================================================
+function collectFormData() {
+  const q1 = {};
+  Q1_ROWS.forEach(row => {
+    const checked = document.querySelector(`input[name="q1_${row.id}"]:checked`);
+    q1[row.id] = checked ? checked.value : '';
+  });
+  const q3 = {};
+  Q3_ITEMS.forEach(item => {
+    q3[item.id] = !!document.querySelector(`input[name="q3"][value="${item.id}"]:checked`);
+  });
+  return {
+    schoolName:    document.getElementById('schoolName').value.trim(),
+    advisorName:   document.getElementById('advisorName').value.trim(),
+    q1,
+    q2_proposal:   getRadioValue('q2'),
+    q2_quality:    getRadioValue('q2b'),
+    q3,
+    q3_other:      document.getElementById('q3OtherText').value,
+    q4_first:      document.getElementById('q4First').value,
+    q4_second:     document.getElementById('q4Second').value,
+    q5_first:      document.getElementById('q5First').value,
+    q5_second:     document.getElementById('q5Second').value,
+    q6_extraTime:  getRadioValue('q6'),
+    q7_freeText:   document.getElementById('q7Text').value,
+  };
+}
+
+function getRadioValue(name) {
+  const checked = document.querySelector(`input[name="${name}"]:checked`);
+  return checked ? checked.value : '';
+}
+
+function saveProgress() {
+  const data = collectFormData();
+  const key = normalizeName(data.advisorName);
+  if (!key) {
+    showToast('氏名を入力してから保存してください', 'error');
+    return;
+  }
+  localStorage.setItem(`marc_survey_${key}`, JSON.stringify(data));
+  showToast('一時保存しました', 'success');
+}
+
+function tryLoadSaved() {
+  const name = document.getElementById('advisorName').value;
+  const key = normalizeName(name);
+  if (!key) return;
+  const saved = localStorage.getItem(`marc_survey_${key}`);
+  if (!saved) return;
+  const data = JSON.parse(saved);
+  // 氏名が一致したら復元
+  if (normalizeName(data.advisorName) !== key) return;
+  restoreFormData(data);
+  showToast('保存データを読み込みました', 'success');
+}
+
+function restoreFormData(data) {
+  if (data.schoolName) document.getElementById('schoolName').value = data.schoolName;
+  // Q1
+  if (data.q1) {
+    Q1_ROWS.forEach(row => {
+      if (data.q1[row.id]) {
+        const radio = document.querySelector(`input[name="q1_${row.id}"][value="${data.q1[row.id]}"]`);
+        if (radio) radio.checked = true;
+      }
+    });
+  }
+  // Q2
+  if (data.q2_proposal) setRadio('q2', data.q2_proposal);
+  if (data.q2_quality)  setRadio('q2b', data.q2_quality);
+  // Q3
+  if (data.q3) {
+    Q3_ITEMS.forEach(item => {
+      if (data.q3[item.id]) {
+        const cb = document.querySelector(`input[name="q3"][value="${item.id}"]`);
+        if (cb) { cb.checked = true; cb.closest('.option-item').classList.add('selected'); }
+      }
+    });
+    if (data.q3.other) {
+      document.getElementById('q3OtherInput').classList.add('visible');
+      document.getElementById('q3OtherText').value = data.q3_other || '';
+    }
+  }
+  // Q4・Q5
+  if (data.q4_first)  document.getElementById('q4First').value  = data.q4_first;
+  if (data.q4_second) document.getElementById('q4Second').value = data.q4_second;
+  if (data.q5_first)  document.getElementById('q5First').value  = data.q5_first;
+  if (data.q5_second) document.getElementById('q5Second').value = data.q5_second;
+  // Q6
+  if (data.q6_extraTime) setRadio('q6', data.q6_extraTime);
+  // Q7
+  if (data.q7_freeText) document.getElementById('q7Text').value = data.q7_freeText;
+
+  // selected クラス更新
+  document.querySelectorAll('.option-item input[type="radio"]').forEach(r => {
+    if (r.checked) r.closest('.option-item').classList.add('selected');
+  });
+  updateProgress();
+}
+
+function setRadio(name, value) {
+  const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+  if (radio) { radio.checked = true; radio.closest('.option-item').classList.add('selected'); }
+}
+
+// ============================================================
+// バリデーション
+// ============================================================
+function validate() {
+  const data = collectFormData();
+  if (!data.schoolName) return '学校名を入力してください';
+  if (!data.advisorName) return '顧問氏名を入力してください';
+  for (const row of Q1_ROWS) {
+    if (!data.q1[row.id]) return `Q1「${row.label}」を選択してください`;
+  }
+  if (!data.q2_proposal)  return 'Q2に回答してください';
+  if (!data.q2_quality)   return 'Q2-2に回答してください';
+  const q3Count = Object.values(data.q3).filter(Boolean).length;
+  if (q3Count === 0) return 'Q3を1つ以上選択してください';
+  if (!data.q4_first)     return 'Q4（1位）を選択してください';
+  if (!data.q5_first)     return 'Q5（1位）を選択してください';
+  if (!data.q6_extraTime) return 'Q6に回答してください';
+  return null;
+}
+
+// ============================================================
+// 送信
+// ============================================================
+async function submitForm() {
+  const error = validate();
+  if (error) { showToast(error, 'error'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  const data = collectFormData();
+  // GASに送れる形に整形
+  const payload = {
+    schoolName:    data.schoolName,
+    advisorName:   data.advisorName,
+    q1_plan:            data.q1.plan,
+    q1_operation:       data.q1.operation,
+    q1_personalGoal:    data.q1.personalGoal,
+    q1_teamGoal:        data.q1.teamGoal,
+    q1_reflection:      data.q1.reflection,
+    q1_juniorCoaching:  data.q1.juniorCoaching,
+    q2_proposal:   data.q2_proposal,
+    q2_quality:    data.q2_quality,
+    q3_technique:       data.q3.technique,
+    q3_kiken:           data.q3.kiken,
+    q3_initiative:      data.q3.initiative,
+    q3_teamwork:        data.q3.teamwork,
+    q3_motivation:      data.q3.motivation,
+    q3_communication:   data.q3.communication,
+    q3_goalSharing:     data.q3.goalSharing,
+    q3_mentalStrength:  data.q3.mentalStrength,
+    q3_other:           data.q3_other,
+    q4_first:      data.q4_first,
+    q4_second:     data.q4_second,
+    q5_first:      data.q5_first,
+    q5_second:     data.q5_second,
+    q6_extraTime:  data.q6_extraTime,
+    q7_freeText:   data.q7_freeText,
+  };
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    const result = await res.json();
+    if (result.status === 'success') {
+      // 送信成功：localStorageを削除してフォーム非表示
+      const key = normalizeName(data.advisorName);
+      localStorage.removeItem(`marc_survey_${key}`);
+      document.getElementById('surveyForm').style.display = 'none';
+      document.getElementById('completeMsg').style.display = 'block';
+      document.getElementById('progressFill').style.width = '100%';
+    } else {
+      throw new Error(result.message || '送信エラー');
+    }
+  } catch (err) {
+    showToast('送信に失敗しました。時間をおいて再度お試しください。', 'error');
+    btn.disabled = false;
+    btn.textContent = '回答を送信する';
+  }
+}
+
+// ============================================================
+// トースト通知
+// ============================================================
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// 起動
+// ============================================================
+buildForm();
+updateProgress();
+</script>
+</body>
+</html>
